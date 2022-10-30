@@ -18,7 +18,7 @@ URL = 'https://github.com/xiejx5/geoplots'
 EMAIL = 'xiejx5@gmail.com'
 AUTHOR = 'Cody James'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.0.2'
+VERSION = '0.1.3'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -104,6 +104,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    package_data={"baseflow": ["icongrid/icons/*.ttf"]},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['geoplots'],
 
