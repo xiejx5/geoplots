@@ -22,7 +22,7 @@ VERSION = '0.1.3'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    # 'matplotlib',
+    'matplotlib',
 ]
 
 # What packages are optional?
