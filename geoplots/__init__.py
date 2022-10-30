@@ -5,3 +5,4 @@ from geoplots.legend import *
 from geoplots.boxplot import *
 from geoplots.heatmap import *
 from geoplots.icongrid import *
+from geoplots.color import *
