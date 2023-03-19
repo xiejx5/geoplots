@@ -17,9 +17,10 @@ def stylize_boxplot(bp, colors):
         bp['whiskers'][i * 2].set_linewidth(1)
         bp['whiskers'][i * 2 + 1].set_linewidth(1)
         # top and bottom fliers
-        bp['fliers'][i].set(markerfacecolor=colors[i],
-                            marker='o', alpha=0.75, markersize=2,
-                            markeredgecolor='none')
+        if len(bp['fliers']) > 0:
+            bp['fliers'][i].set(markerfacecolor=colors[i],
+                                marker='o', alpha=0.75, markersize=2,
+                                markeredgecolor='none')
         bp['medians'][i].set_color('black')
         bp['medians'][i].set_linewidth(1)
         # and 4 caps to remove

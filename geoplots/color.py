@@ -12,3 +12,11 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=256):
         f'trunc({cmap.name},{minval:.2f},{maxval:.2f})',
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
+
+
+def boundary_cmap(colors, bounds):
+    colors = [c if isinstance(c, str) else rgb2hex(c) for c in colors]
+    bmap = mpl.colors.LinearSegmentedColormap.from_list(
+        'boundary_cmap', list(zip(np.linspace(0, 1, len(colors)), colors)))
+    norm = mpl.colors.BoundaryNorm(bounds, bmap.N)
+    return bmap, norm
