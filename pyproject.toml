@@ -1,0 +1,28 @@
+[project]
+name = "geoplots"
+version = "0.2.0"
+description = "Matplotlib rcParams for geospatial plots "
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Cody James", email = "xiejx5@gmail.com" }]
+requires-python = ">=3.8"
+dependencies = [
+    "matplotlib",
+    "cartopy",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel<7",
+]
+
+[project.urls]
+Homepage = "https://github.com/xiejx5/geoplots"
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "geoplots"
+module-root = ""
