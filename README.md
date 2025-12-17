@@ -1,29 +1,53 @@
-### Matplotlib rcParams for GeoSpatial Plots 
-=======================
+# Geoplots
 
-Installation
------
+A library for geographic plotting and visualization, built on top of Matplotlib and Cartopy.
+
+## Installation
+
+You can install the package using `pip`:
 
 ```bash
-pip install geoplots -U
+pip install geoplots
 ```
 
-Usage
------
+## Usage
+
+### Initialization
+
+Initialize a figure with a custom grid:
+
+```python
+from geoplots import wrapper
+
+fig, grids = wrapper.init(figsize=(10, 6), widths=[1, 2], heights=[1, 1])
+```
+
+### Geographical Plots
+
+Create plots with specific boundaries:
 
 ```python
 import matplotlib.pyplot as plt
-from geoplots import params
+from geoplots import bound
+import cartopy.crs as ccrs
 
-plt.rcParams.update(params)
-
+fig = plt.figure(figsize=(10, 5))
+ax = fig.add_subplot(111, projection=ccrs.Robinson())
+bound.robinson_bound(ax)
 ```
 
-License
--------
+### Icon Grids (Waffle Charts)
 
-This is free and unencumbered software released into the public domain.
+Create waffle charts with icons:
 
-Anyone is free to copy, modify, publish, use, compile, sell, or
-distribute this software, either in source code form or as a compiled
-binary, for any purpose, commercial or non-commercial, and by any means.
+```python
+from geoplots.icongrid import Waffle
+
+data = {'Cats': 30, 'Dogs': 25, 'Birds': 10}
+fig = plt.figure(
+    FigureClass=Waffle,
+    rows=5,
+    values=data,
+    legend={'loc': 'upper left', 'bbox_to_anchor': (1.1, 1)}
+)
+```

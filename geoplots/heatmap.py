@@ -9,8 +9,8 @@ def heatmap(df, ax=None, row_labels=None, col_labels=None, **kwargs):
 
     Parameters
     ----------
-    data
-        A 2D numpy array of shape (M, N).
+    df
+        A pandas DataFrame where values are plotted.
     ax
         A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
         not provided, use current axes or create a new one.  Optional.
@@ -39,33 +39,40 @@ def heatmap(df, ax=None, row_labels=None, col_labels=None, **kwargs):
     im = ax.imshow(df.values, **kwargs)
 
     # Show all ticks and label them with the respective list entries.
-    ax.set_xticks(np.arange(df.shape[1]), labels=col_labels,
-                  fontweight='bold', fontname='consolas')
-    ax.set_yticks(np.arange(df.shape[0]), labels=row_labels,
-                  fontweight='bold', fontname='consolas')
+    ax.set_xticks(
+        np.arange(df.shape[1]),
+        labels=col_labels,
+        fontweight='bold',
+        fontname='consolas',
+    )
+    ax.set_yticks(
+        np.arange(df.shape[0]),
+        labels=row_labels,
+        fontweight='bold',
+        fontname='consolas',
+    )
 
     # Let the horizontal axes labeling appear on top.
-    ax.tick_params(top=True, bottom=False,
-                   labeltop=True, labelbottom=False)
+    ax.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False)
 
     # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=0, ha="center",
-             rotation_mode="anchor")
+    plt.setp(ax.get_xticklabels(), rotation=0, ha='center', rotation_mode='anchor')
 
     # Turn spines off and create white grid.
     ax.spines[:].set_visible(False)
 
-    ax.set_xticks(np.arange(df.shape[1] + 1) - .5, minor=True)
-    ax.set_yticks(np.arange(df.shape[0] + 1) - .5, minor=True)
-    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
-    ax.tick_params(which="minor", bottom=False, left=False)
+    ax.set_xticks(np.arange(df.shape[1] + 1) - 0.5, minor=True)
+    ax.set_yticks(np.arange(df.shape[0] + 1) - 0.5, minor=True)
+    ax.grid(which='minor', color='w', linestyle='-', linewidth=3)
+    ax.tick_params(which='minor', bottom=False, left=False)
     ax.tick_params(length=0)
 
     return im
 
 
-def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
-                     textcolors="black", bounds=None, **textkw):
+def annotate_heatmap(
+    im, data=None, valfmt='{x:.2f}', textcolors='black', bounds=None, **textkw
+):
     """
     A function to annotate a heatmap.
 
@@ -104,8 +111,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
     # Set default alignment to center, but allow it to be
     # overwritten by textkw.
-    kw = dict(horizontalalignment="center",
-              verticalalignment="center")
+    kw = dict(horizontalalignment='center', verticalalignment='center')
     kw.update(textkw)
 
     # Get the formatter in case a string is supplied

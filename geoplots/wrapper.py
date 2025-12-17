@@ -3,20 +3,75 @@ from geoplots._const import params
 from matplotlib.transforms import Bbox
 
 
-def init(figsize, widths=None, heights=None, wspace=0, hspace=0,
-         left=0.005, right=0.995, bottom=0.005, top=0.995, **kwargs):
+def init(
+    figsize,
+    widths=None,
+    heights=None,
+    wspace=0,
+    hspace=0,
+    left=0.005,
+    right=0.995,
+    bottom=0.005,
+    top=0.995,
+    **kwargs,
+):
+    """
+    Initialize a figure with a grid of subplots.
+
+    Parameters
+    ----------
+    figsize : tuple
+        The figure size (width, height) in inches.
+    widths : list, optional
+        List of width ratios for columns.
+    heights : list, optional
+        List of height ratios for rows.
+    wspace : float, optional
+        Width space between subplots.
+    hspace : float, optional
+        Height space between subplots.
+    left, right, bottom, top : float, optional
+        Margins of the subplots.
+    **kwargs
+        Additional arguments passed to `plt.figure`.
+
+    Returns
+    -------
+    tuple
+        (fig, grids) where fig is the Figure and grids is the GridSpec.
+    """
     plt.rcParams.update(params)
     fig = plt.figure(figsize=figsize, **kwargs)
     ncols = 1 if widths is None else len(widths)
     nrows = 1 if heights is None else len(heights)
-    grids = fig.add_gridspec(ncols=ncols, nrows=nrows,
-                             width_ratios=widths, wspace=wspace,
-                             height_ratios=heights, hspace=hspace,
-                             left=left, right=right, bottom=bottom, top=top)
+    grids = fig.add_gridspec(
+        ncols=ncols,
+        nrows=nrows,
+        width_ratios=widths,
+        wspace=wspace,
+        height_ratios=heights,
+        hspace=hspace,
+        left=left,
+        right=right,
+        bottom=bottom,
+        top=top,
+    )
     return fig, grids
 
 
 def title(ax, label=None, **kwargs):
+    """
+    Set the title of an axes, automatically handling positioning and numbering.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes to set the title for.
+    label : str or int, optional
+        The title text. If None or int, a letter ('a', 'b', ...) is generated.
+    **kwargs
+        Additional arguments passed to `ax.set_title`.
+    """
     axes_list = [axes for axes in ax.figure.axes if 'colorbar' not in axes.get_label()]
     if label is None:
         kwargs['fontweight'] = kwargs.pop('fontweight', 'bold')
@@ -36,6 +91,18 @@ def title(ax, label=None, **kwargs):
 
 
 def highlight(ax, label, color='red'):
+    """
+    Highlight a specific tick label on the axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes containing the tick label.
+    label : str
+        The text of the label to highlight.
+    color : str, optional
+        The color to set for the label (default is 'red').
+    """
     if label in [t.get_text() for t in ax.get_xticklabels()]:
         ticklabels = ax.get_xticklabels()
     else:
@@ -43,10 +110,12 @@ def highlight(ax, label, color='red'):
 
     idx = [t.get_text() for t in ticklabels].index(label)
     ticklabels[idx].set_color(color)
-    ticklabels[idx].set_weight("bold")
+    ticklabels[idx].set_weight('bold')
 
 
-def colorbar(ax, mappable=None, width='1%', height='80%', pad='1%', reverse=False, **kwargs):
+def colorbar(
+    ax, mappable=None, width='1%', height='80%', pad='1%', reverse=False, **kwargs
+):
     """
     Add a new axes on a given side of the main axes.
 
@@ -91,7 +160,9 @@ def colorbar(ax, mappable=None, width='1%', height='80%', pad='1%', reverse=Fals
 
     # cax = ax.inset_axes(bounds) cannot set_position
     bbox = ax.transAxes.transform(Bbox.from_bounds(*bounds))
-    cax = ax.figure.add_axes(Bbox(ax.figure.transFigure.inverted().transform(bbox)).bounds)
+    cax = ax.figure.add_axes(
+        Bbox(ax.figure.transFigure.inverted().transform(bbox)).bounds
+    )
     cb = ax.figure.colorbar(mappable=mappable, cax=cax, **kwargs)
     cb.outline.set_visible(False)
     cax.tick_params(left=False, right=False, bottom=False, top=False, pad=2)
@@ -101,6 +172,16 @@ def colorbar(ax, mappable=None, width='1%', height='80%', pad='1%', reverse=Fals
 
 
 def tight(ax, label=None):
+    """
+    Adjust the axes position to be tight, considering an optional colorbar.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes to adjust.
+    label : str, optional
+        Label for the axes title (passed to `title`).
+    """
     if hasattr(ax, 'cax'):
         cax = ax.cax
         ax.add_child_axes(cax)
@@ -148,9 +229,23 @@ def tight(ax, label=None):
         elif loc == 'left':
             cax.set_position([l + dx0, bb + (1 - ratio) / 2 * hh, w, ratio * hh])
         elif loc == 'bottom':
-            cax.set_position([ll + (1 - ratio) / 2 * ww, b + (bbox - bbox1)[0, 1] + dy0, ratio * ww, h])
+            cax.set_position(
+                [
+                    ll + (1 - ratio) / 2 * ww,
+                    b + (bbox - bbox1)[0, 1] + dy0,
+                    ratio * ww,
+                    h,
+                ]
+            )
         elif loc == 'top':
-            cax.set_position([ll + (1 - ratio) / 2 * ww, b + (bbox - bbox1)[0, 1] - dy1, ratio * ww, h])
+            cax.set_position(
+                [
+                    ll + (1 - ratio) / 2 * ww,
+                    b + (bbox - bbox1)[0, 1] - dy1,
+                    ratio * ww,
+                    h,
+                ]
+            )
 
     # add label to title
     if label is None:

@@ -14,33 +14,68 @@ from itertools import product
 
 def ceil(a, b):
     """
-    Just like math.ceil
+    Calculate the ceiling of a division.
+
+    Parameters
+    ----------
+    a : number
+        The dividend.
+    b : number
+        The divisor.
+
+    Returns
+    -------
+    int
+        The ceiling of a / b.
     """
     return int(a // b + bool(a % b))
 
 
 def array_resize(array, length, array_len=None):
     """
-    Resize array to given length. If the array is shorter than given length, repeat the array; If the array is longer
-    than the length, trim the array.
-    :param array: array
-    :param length: target length
-    :param array_len: if length of original array is known, pass it in here
-    :return: axtended array
+    Resize array to given length by repeating or trimming.
+
+    Parameters
+    ----------
+    array : list or numpy.ndarray
+        The input array.
+    length : int
+        The target length.
+    array_len : int, optional
+        The original length of the array (if known).
+
+    Returns
+    -------
+    list or numpy.ndarray
+        The resized array.
     """
     if not array_len:
         array_len = len(array)
-    return array * (length // array_len) + array[:length % array_len]
+    return array * (length // array_len) + array[: length % array_len]
 
 
 _FONT_PATH = os.path.dirname(__file__)
 FONT_FOLDER = {
     'brands': os.path.join(_FONT_PATH, 'icons', 'fa-brands-400.ttf'),
     'solid': os.path.join(_FONT_PATH, 'icons', 'fa-solid-900.ttf'),
-    'regular': os.path.join(_FONT_PATH, 'icons', 'fa-regular-400.ttf')
+    'regular': os.path.join(_FONT_PATH, 'icons', 'fa-regular-400.ttf'),
 }
 
+
 class TextLegend(object):
+    """
+    A legend handle for text icons.
+
+    Parameters
+    ----------
+    text : str
+        The text or icon character.
+    color : str
+        The color of the text.
+    **kwargs
+        Additional arguments.
+    """
+
     def __init__(self, text, color, **kwargs):
         self.text = text
         self.color = color
@@ -48,18 +83,29 @@ class TextLegend(object):
 
 
 class TextLegendHandler(HandlerBase):
+    """
+    Handler for drawing TextLegend items.
+
+    Parameters
+    ----------
+    font_file : str
+        Key for the font file in FONT_FOLDER.
+    """
+
     def __init__(self, font_file):
         super().__init__()
         self.font_file = FONT_FOLDER[font_file]
 
-    def create_artists(self, legend, orig_handle, xdescent, ydescent, width, height, fontsize, trans):
+    def create_artists(
+        self, legend, orig_handle, xdescent, ydescent, width, height, fontsize, trans
+    ):
         x = xdescent + width / 2.0
         y = ydescent + height / 2.0
         kwargs = {
             'horizontalalignment': 'center',
             'verticalalignment': 'center',
             'color': orig_handle.color,
-            'fontproperties': fm.FontProperties(fname=self.font_file, size=fontsize)
+            'fontproperties': fm.FontProperties(fname=self.font_file, size=fontsize),
         }
         kwargs.update(orig_handle.kwargs)
         annotation = Text(x, y, orig_handle.text, **kwargs)
@@ -72,11 +118,12 @@ class TextLegendHandler(HandlerBase):
             'horizontalalignment': 'center',
             'verticalalignment': 'center',
             'color': orig_handle.color,
-            'fontproperties': fm.FontProperties(fname=self.font_file, size=fontsize)
+            'fontproperties': fm.FontProperties(fname=self.font_file, size=fontsize),
         }
         kwargs.update(orig_handle.kwargs)
-        patch = Text(x=x0 + width / 2, y=height / 2 - y0,
-                     text=orig_handle.text, **kwargs)
+        patch = Text(
+            x=x0 + width / 2, y=height / 2 - y0, text=orig_handle.text, **kwargs
+        )
         handlebox.add_artist(patch)
         return patch
 
@@ -242,32 +289,44 @@ class Waffle(Figure):
             if arg not in self._pa:
                 self._pa[arg] = v
 
-        element = np.delete(np.unique(self._pa['values']),
-                            np.where(np.unique(self._pa['values']) == self._pa['nan'])[0])
+        element = np.delete(
+            np.unique(self._pa['values']),
+            np.where(np.unique(self._pa['values']) == self._pa['nan'])[0],
+        )
         self.values_len = element.shape[0]
 
         # Build a color sequence if colors is empty
         if self._pa['colors'] is not None:
             if isinstance(self._pa['colors'], dict):
-                self._pa['colors'] = {i: self._pa['colors'][i]
-                                      for i in element}
+                self._pa['colors'] = {i: self._pa['colors'][i] for i in element}
             else:
-                self._pa['colors'] = {i: self._pa['colors']
-                                      for i in element}
+                self._pa['colors'] = {i: self._pa['colors'] for i in element}
         else:
             default_colors = cm.get_cmap(self._pa['cmap_name']).colors
             default_color_num = cm.get_cmap(self._pa['cmap_name']).N
-            self._pa['colors'] = dict(zip(element,
-                                          array_resize(array=default_colors, length=self.values_len, array_len=default_color_num)))
+            self._pa['colors'] = dict(
+                zip(
+                    element,
+                    array_resize(
+                        array=default_colors,
+                        length=self.values_len,
+                        array_len=default_color_num,
+                    ),
+                )
+            )
 
         rectangle_args = {}
         for k, v in self._pa['rectangle_args'].items():
             if isinstance(v, dict):
-                rectangle_args[k] = {i: self._pa['rectangle_args'][k][i] for i in element}
+                rectangle_args[k] = {
+                    i: self._pa['rectangle_args'][k][i] for i in element
+                }
             else:
                 rectangle_args[k] = {i: self._pa['rectangle_args'][k] for i in element}
-        if not any(i in rectangle_args.keys() for i in
-                   ['color', 'edgecolor', 'facecolor', 'ec', 'fc']):
+        if not any(
+            i in rectangle_args.keys()
+            for i in ['color', 'edgecolor', 'facecolor', 'ec', 'fc']
+        ):
             rectangle_args['color'] = self._pa['colors']
 
         if isinstance(self._pa['values'], dict):
@@ -282,24 +341,24 @@ class Waffle(Figure):
             from .fontawesome_mapping import icons
 
             if self._pa['icon_set'] not in icons.keys():
-                raise KeyError('icon_set should be one of {}'.format(
-                    ', '.join(icons.keys())))
+                raise KeyError(
+                    'icon_set should be one of {}'.format(', '.join(icons.keys()))
+                )
 
             # If icons is a string, convert it into a list of same icon. It's length is the label's length
             # '\uf26e' -> ['\uf26e', '\uf26e', '\uf26e', ]
             if isinstance(self._pa['icons'], str):
-                self._pa['icons'] = {i: self._pa['icons']
-                                     for i in element}
+                self._pa['icons'] = {i: self._pa['icons'] for i in element}
 
             if len(self._pa['icons']) < self.values_len:
                 raise ValueError("Length of icons doesn't match the values.")
 
-            self._pa['icons'] = {i: icons[self._pa['icon_set']]
-                                 [self._pa['icons'][i]] for i in element}
+            self._pa['icons'] = {
+                i: icons[self._pa['icon_set']][self._pa['icons'][i]] for i in element
+            }
 
         if self._pa['rotation']:
-            self._pa['rotation'] = {i: self._pa['rotation'][i]
-                                    for i in element}
+            self._pa['rotation'] = {i: self._pa['rotation'][i] for i in element}
 
         if isinstance(loc, tuple):
             self.ax = self.add_subplot(*loc, aspect='equal')
@@ -315,8 +374,9 @@ class Waffle(Figure):
         # Absolute height of the plot
         figure_height = 1
         block_y_length = figure_height / (
-            self._pa['rows'] + self._pa['rows'] *
-            self._pa['interval_ratio_y'] - self._pa['interval_ratio_y']
+            self._pa['rows']
+            + self._pa['rows'] * self._pa['interval_ratio_y']
+            - self._pa['interval_ratio_y']
         )
         block_x_length = self._pa['block_aspect'] * block_y_length
 
@@ -324,11 +384,13 @@ class Waffle(Figure):
         self.ax.axis(
             xmin=0,
             xmax=(
-                self._pa['columns'] + self._pa['columns'] *
-                self._pa['interval_ratio_x'] - self._pa['interval_ratio_x']
-            ) * block_x_length,
+                self._pa['columns']
+                + self._pa['columns'] * self._pa['interval_ratio_x']
+                - self._pa['interval_ratio_x']
+            )
+            * block_x_length,
             ymin=0,
-            ymax=figure_height
+            ymax=figure_height,
         )
 
         # Default font size
@@ -336,13 +398,13 @@ class Waffle(Figure):
             x, y = self.ax.transData.transform([(0, 0), (0, block_x_length)])
             prop = fm.FontProperties(
                 fname=FONT_FOLDER[self._pa['icon_set']],
-                size=self._pa['icon_size'] or int((y[1] - x[1]) / 16 * 12)
+                size=self._pa['icon_size'] or int((y[1] - x[1]) / 16 * 12),
             )
         elif self._pa['show_num']:
             x, y = self.ax.transData.transform([(0, 0), (0, block_x_length)])
             prop = fm.FontProperties(
                 family='consolas',
-                size=self._pa['icon_size'] or int((y[1] - x[1]) / 16 * 12)
+                size=self._pa['icon_size'] or int((y[1] - x[1]) / 16 * 12),
             )
 
         # Plot blocks
@@ -355,11 +417,16 @@ class Waffle(Figure):
             column_order = self._direction_values[plot_direction]['column_order']
             row_order = self._direction_values[plot_direction]['row_order']
         except KeyError:
-            raise KeyError(
-                "plot_direction should be one of 'NW', 'SW', 'NE', 'SE'")
+            raise KeyError("plot_direction should be one of 'NW', 'SW', 'NE', 'SE'")
 
-        iter_cell = ((col, row) for col, row in product(range(self._pa['columns'])[::column_order], range(self._pa['rows'])[::row_order]) if
-                     self._pa['values'][self._pa['rows'] - 1 - row, col] != self._pa['nan'])
+        iter_cell = (
+            (col, row)
+            for col, row in product(
+                range(self._pa['columns'])[::column_order],
+                range(self._pa['rows'])[::row_order],
+            )
+            if self._pa['values'][self._pa['rows'] - 1 - row, col] != self._pa['nan']
+        )
         for col, row in iter_cell:
             x = x_full * col
             y = y_full * row
@@ -367,15 +434,18 @@ class Waffle(Figure):
             if self._pa['icons']:
                 rotation_arg = None
                 if self._pa['rotation']:
-                    rotation_arg = self._pa['rotation'][self._pa['values']
-                                                        [self._pa['rows'] - 1 - row, col]]
+                    rotation_arg = self._pa['rotation'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ]
                 self.ax.text(
                     x=x + block_x_length * (1 / 2 + self._pa['x_offset']),
                     y=y + block_y_length * (1 / 2 + self._pa['y_offset']),
-                    s=self._pa['icons'][self._pa['values']
-                                        [self._pa['rows'] - 1 - row, col]],
-                    color=self._pa['colors'][self._pa['values']
-                                             [self._pa['rows'] - 1 - row, col]],
+                    s=self._pa['icons'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ],
+                    color=self._pa['colors'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ],
                     fontproperties=prop,
                     horizontalalignment='center',
                     verticalalignment='center',
@@ -385,30 +455,40 @@ class Waffle(Figure):
                 self.ax.text(
                     x=x + block_x_length * (1 / 2 + self._pa['x_offset']),
                     y=y + block_y_length * (1 / 2 + self._pa['y_offset']),
-                    s=str(self._pa['values']
-                          [self._pa['rows'] - 1 - row, col]),
-                    color=self._pa['colors'][self._pa['values']
-                                             [self._pa['rows'] - 1 - row, col]],
+                    s=str(self._pa['values'][self._pa['rows'] - 1 - row, col]),
+                    color=self._pa['colors'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ],
                     fontproperties=prop,
                     horizontalalignment='center',
-                    verticalalignment='center'
+                    verticalalignment='center',
                 )
             elif self._pa['marker']:
                 self.ax.plot(
                     x + block_x_length * (1 / 2 + self._pa['x_offset']),
                     y + block_y_length * (1 / 2 + self._pa['y_offset']),
-                    color=self._pa['colors'][self._pa['values']
-                                             [self._pa['rows'] - 1 - row, col]],
-                    marker=self._pa['marker'][self._pa['values']
-                                              [self._pa['rows'] - 1 - row, col]],
-                    **self._pa['marker_args']
+                    color=self._pa['colors'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ],
+                    marker=self._pa['marker'][
+                        self._pa['values'][self._pa['rows'] - 1 - row, col]
+                    ],
+                    **self._pa['marker_args'],
                 )
             else:
-                temp_args = {k: v[self._pa['values'][self._pa['rows'] - 1 - row, col]]
-                             for k, v in rectangle_args.items()}
+                temp_args = {
+                    k: v[self._pa['values'][self._pa['rows'] - 1 - row, col]]
+                    for k, v in rectangle_args.items()
+                }
                 self.ax.add_artist(
-                    Rectangle(xy=(x, y), width=block_x_length, clip_on=False,
-                              height=block_y_length, **temp_args))
+                    Rectangle(
+                        xy=(x, y),
+                        width=block_x_length,
+                        clip_on=False,
+                        height=block_y_length,
+                        **temp_args,
+                    )
+                )
 
         # Add title
         if self._pa['title'] is not None:
@@ -418,14 +498,17 @@ class Waffle(Figure):
         if self._pa['labels'] or 'labels' in self._pa['legend']:
             if self._pa['icons'] and self._pa['icon_legend']:
                 self._pa['legend']['handles'] = [
-                    TextLegend(color=c, text=i) for c, i in zip(self._pa['colors'], self._pa['icons'])
+                    TextLegend(color=c, text=i)
+                    for c, i in zip(self._pa['colors'], self._pa['icons'])
                 ]
                 self._pa['legend']['handler_map'] = {
-                    TextLegend: TextLegendHandler(self._pa['icon_set'])}
+                    TextLegend: TextLegendHandler(self._pa['icon_set'])
+                }
             # elif not self._pa['legend'].get('handles'):
             elif 'handles' not in self._pa['legend']:
                 self._pa['legend']['handles'] = [
-                    Patch(color=c, label=str(l)) for c, l in zip(self._pa['colors'], self._pa['labels'])
+                    Patch(color=c, label=str(l))
+                    for c, l in zip(self._pa['colors'], self._pa['labels'])
                 ]
 
             # labels is an alias of legend['labels']
