@@ -13,7 +13,7 @@ params = {
     'legend.labelspacing': 1,
     'legend.borderpad': 0.5,
     'legend.borderaxespad': 0.5,
-    'axes.labelpad': 4,
+    'axes.labelpad': 2,
     'axes.linewidth': 0.4,
     'patch.linewidth': 0.7,
     'lines.linewidth': 1,
