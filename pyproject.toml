@@ -1,6 +1,6 @@
 [project]
 name = "geoplots"
-version = "0.2.4"
+version = "0.2.5"
 description = "Matplotlib rcParams for geospatial plots "
 readme = "README.md"
 license = "MIT"
